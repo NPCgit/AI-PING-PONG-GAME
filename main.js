@@ -1,4 +1,6 @@
-
+rightwristx = ''
+rightwristy = ''
+rightwristscore = ''
 /*created by prashant shukla */
 
 var paddle2 =10,paddle1=10;
@@ -23,6 +25,29 @@ var ball = {
 
 function setup(){
   var canvas =  createCanvas(700,600);
+  canvas.parent("canvas");
+  video = createCapture(VIDEO);
+  video.size(700, 600);
+  video.hide();
+  
+  poseNet = ml5.poseNet(video, modelLoaded);
+  poseNet.on('pose', gotPoses);
+}
+function modelLoaded()
+{
+  console.log("Model Loaded!")
+}
+
+function gotPoses(results)
+{
+  if(results.length > 0)
+  {
+    rightwristx = results[0].pose.rightWrist.x;
+    rightwristy = results[0].pose.rightWrist.y;
+    rightwristscore = results[0].pose.keypoints[10].score;
+    console.log(rightwristx+ " "+ rightwristy + " "+ rightwristscore);
+    console.log(results);
+  }
 }
 
 
@@ -65,6 +90,15 @@ function draw(){
    
    //function move call which in very important
     move();
+    image(video, 0, 0, 700, 600);
+
+    if (rightwristscore < 0.2)
+      {
+        fill("#FF0000");
+        stroke("#FFF000");
+        strokeWeight(3);
+        circle(rightwristx, rightwristy, 15);
+      }
 }
 
 
